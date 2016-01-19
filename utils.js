@@ -22,6 +22,7 @@ function createButton(name, action){
 	button.type = "button";
 	button.value = name;
 	button.onclick = action;
+	button.setAttribute('id', 'custom_' + name);
 	return button;
 }
 

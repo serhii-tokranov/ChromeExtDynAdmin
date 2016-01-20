@@ -1,6 +1,9 @@
 // Console object name
 var EXT_CONSOLE_DIV = "DynAdminExtentionConsole";
 var EXT_CONSOLE_DIV_ID = "#" + EXT_CONSOLE_DIV;
+var BUTTON_STYLE = 'margin:2px;padding:2px;';
+var BUTTON_BORDER_RED = 'border: 2px solid red;';
+var BUTTON_BORDER_GREEN = 'border: 2px solid green;';
 
 initExtentionConsole();
 addChangePropertyValueButton("loggingDebug", "loggingDebug");
@@ -20,7 +23,6 @@ function initExtentionConsole(){
 
 //TODO for now it forks only for boolean properties
 function addChangePropertyValueButton(buttonName, propertyName){
-	var buttonStyle = 'margin:2px;padding:2px;';
 	var button = createButton(buttonName, function(){
 			var propertyObject = $('a:contains("' + propertyName + '")').closest('td').next().find('span');
 			var currentValue = $.parseJSON(propertyObject.text());
@@ -30,19 +32,17 @@ function addChangePropertyValueButton(buttonName, propertyName){
 				data: {'propertyName':propertyName,'newValue':!currentValue,'change':'Change Value'},
 				success: function (data) {
 					propertyObject.text(!currentValue);
-					if (!currentValue === true){
-						button.setAttribute('style', buttonStyle);	
-					} else {
-						button.setAttribute('style', buttonStyle + 'border: 2px solid red;');
-					}
+					button.setAttribute('style', getButtonStyleOfBooleanTrigger(!currentValue));
                 }
 			})
 		}
 	);
-	if (!getBooleanPropertyValue(propertyName)){
-		button.setAttribute('style', buttonStyle + 'border: 2px solid red;');
-	}
+	button.setAttribute('style', getButtonStyleOfBooleanTrigger(getBooleanPropertyValue(propertyName)));
 	$(EXT_CONSOLE_DIV_ID).append(button);
+}
+
+function getButtonStyleOfBooleanTrigger(value){
+	return BUTTON_STYLE + (value ? BUTTON_BORDER_GREEN : BUTTON_BORDER_RED);
 }
 
 function getBooleanPropertyValue(propertyName){

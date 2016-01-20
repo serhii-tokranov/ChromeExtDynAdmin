@@ -1,7 +1,7 @@
 {
 "name":"Dyn Admin Utils",
 "description":"This utility is designed in order to improve a dyn admin usability.",
-"version":"1.1.4",
+"version":"1.1.6",
 "manifest_version":2,
 "content_scripts": [
     {

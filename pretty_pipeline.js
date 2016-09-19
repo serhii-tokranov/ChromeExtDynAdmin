@@ -1,12 +1,26 @@
 // Printing pretty pipeline structure
+
+// --------------------- Statics ----------------------------
+
 var PRETTY_DEFINITION_CONTAINER = "PRETTY_DEFINITION_CONTAINER";
 var PRETTY_DEFINITION_CONTAINER_ID = "#" + PRETTY_DEFINITION_CONTAINER;
+
+// -------------------- Processing code ---------------------
 
 createContainer();
 
 var definitionXMLDocument = getDefinitionXML();
 console.log(definitionXMLDocument);
 addToDefinitionContainer($(definitionXMLDocument).text());
+$(PRETTY_DEFINITION_CONTAINER_ID).html('');
+
+var chainList = buildDataArrayFromXML(definitionXMLDocument, {});
+
+$.each(chainList, function (ind, curChain){
+    createTableForChainNew(curChain, curChain.name);
+});
+
+// --------------------- Functions ---------------------------
 
 function getDefinitionXML(){
     return $.parseXML($('pre').first().text());
@@ -19,11 +33,6 @@ function createContainer(){
 function addToDefinitionContainer(value){
     $(PRETTY_DEFINITION_CONTAINER_ID).append(JSON.stringify(value));
 }
-
-$(PRETTY_DEFINITION_CONTAINER_ID).html('');
-
-var chainList = buildDataArrayFromXML(definitionXMLDocument, {});
-//addToDefinitionContainer(chainList);
 
 function buildDataArrayFromXML(definitionXMLDocument, chainList){
     // searching for all pipeline chains
@@ -61,60 +70,19 @@ function buildChainObject(chain){
     return chainObj;
 }
 
-// Building presentation
-
-//var updateOrderChain = chainList['validatePaymentGroupPreConfirmation'];
-//createTableForChain(updateOrderChain, updateOrderChain.name);
-/*$.each(chainList, function (ind, curChain){
-    createTableForChain(curChain, curChain.name);
-});*/
-
-/*function createTableForChain(chain, chainName){
-    // Creating table for a chain
-    $(PRETTY_DEFINITION_CONTAINER_ID).append('<table id="chain-' + chainName + '" style="font-size: 12px;"><tr></tr></table>');
-    var chainTableSelector = PRETTY_DEFINITION_CONTAINER_ID + ' #chain-' + chainName + ' tr';
-    $(chainTableSelector).append('<td style="border: 1px solid black; text-align : center;">' + chainName + '</td>');
-    addArrowColumn(chainTableSelector, '');
-
-    var stop = false;
-    var i = 0;
-    var curLinkName = chain.headlink;
-    var curLink = chain.links[chain.headlink];
-
-    while(!stop || i < 10){
-        i++;
-        console.log(curLink);
-        $(chainTableSelector).append('<td style="border: 1px solid black; text-align : center;">' + curLinkName + '<br>' + curLink.processor + '</td>');
-        if (curLink.transitions != null && curLink.transitions.length > 0){
-            $.each(curLink.transitions, function (index, element){
-                addArrowColumn(chainTableSelector, element.returnValue);
-                curLinkName = element.linkName;
-                curLink = chain.links[element.linkName];
-            });
-        } else {
-            stop = true;
-        }
-
-    }
+function linkPathToComponent(componentPath){
+    return document.location.origin + '/dyn/admin/nucleus/' + componentPath;
 }
 
-function addArrowColumn(chainTableSelector, returnValue){
-    $(chainTableSelector).append('<td>' + returnValue + '></td>');
-}*/
-
-console.log(chainList);
-//var updateOrderChain = chainList['updateOrder'];
-//var updateOrderChain = chainList['validatePaymentGroupPreConfirmation'];
-//createTableForChainNew(updateOrderChain, updateOrderChain.name);
-$.each(chainList, function (ind, curChain){
-    createTableForChainNew(curChain, curChain.name);
-});
+function htmlLinkToComponent(componentPath){
+    var plainLink = linkPathToComponent(componentPath);
+    return '<a href="' + plainLink + '">' + componentPath + '</a>';
+}
 
 function createTableForChainNew(chain, chainName){
     // Creating table for a chain
     $(PRETTY_DEFINITION_CONTAINER_ID).append('<table id="chain-' + chainName + '" style="font-size: 12px;"><tr></tr></table>');
     $(getChainTableSelector(chainName)).append('<td style="border: 1px solid black; text-align : center;">' + chainName + '</td>');
-    //addArrowColumn(getChainTableSelector(chainName), '');
     var curLink = chain.links[chain.headlink];
     var curLinkName = chain.headlink;
     processPipeLink(chain, curLink, curLinkName, '', 2, 0, false);
@@ -124,18 +92,13 @@ function processPipeLink(chain, link, linkName, transitionVal, elemNum, rowNumbe
     if(appendRow){
         appendRows(elemNum, rowNumber, chain.name);
     }
-    console.log(link);
-    console.log('rowNumber=' + rowNumber);
     $(getChainTableSelector(chain.name)).eq(rowNumber).append('<td>' + transitionVal + '></td>');
-    console.log('tr=' + $(getChainTableSelector(chain.name)).eq(rowNumber));
-    $(getChainTableSelector(chain.name)).eq(rowNumber).append('<td style="border: 1px solid black; text-align : center;">' + linkName + '<br>' + link.processor + '</td>');
+    $(getChainTableSelector(chain.name)).eq(rowNumber).append('<td style="border: 1px solid black; text-align : center;">' + linkName + '<br>' + htmlLinkToComponent(link.processor) + '</td>');
     if (link.transitions != null && link.transitions.length > 0){
         $.each(link.transitions, function (index, element){
             if (index == 0){
-                console.log('First transition');
                 processPipeLink(chain, chain.links[element.linkName], element.linkName, element.returnValue, elemNum + 1, rowNumber, false);
             } else {
-                console.log('Appending transition');
                 processPipeLink(chain, chain.links[element.linkName], element.linkName, element.returnValue, elemNum + 1, ++rowNumber, true);
             }
         });

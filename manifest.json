@@ -14,7 +14,7 @@
     },
     {
       "matches": ["*://*/dyn/admin*/PipelineManager/?propertyName=definitionFile"],
-      "js": ["jquery-1.12.0.min.js", "Map.js", "utils.js", "common.js" , "pretty_pipeline.js"]
+      "js": ["jquery-1.12.0.min.js", "utils.js", "common.js" , "pretty_pipeline.js"]
     }
   ]
 }
